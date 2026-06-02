@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
     await client.send({
       from: { name: 'Black Bird Services', email: senderEmail },
-      to: [{ email: 'alexm900902@gmail.com' }],
+      to: [{ email: 'tovelrob@proton.me' }],
       subject: `New Quote Request from ${firstName} ${lastName}`,
       text,
     });
