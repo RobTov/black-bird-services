@@ -1,3 +1,5 @@
+import { MailtrapClient } from 'mailtrap';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -12,54 +14,42 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const fields = {
-    'First Name': firstName,
-    'Last Name': lastName,
-    'Pick Up Date': pickupDate,
-    'Pick Up Time': pickupTime,
-    'Pick Up Location': pickupLocation,
-    'Destination': destination || 'N/A',
-    'Service Type': serviceType,
-    'Hours': hours,
-    'Passengers': passengers,
-    'Phone': phone,
-    'Email': email,
-  };
+  const token = process.env.MAILTRAP_PASS;
+  const senderEmail = process.env.MAILTRAP_SENDER || 'info@norbwebsite.com';
 
-  const rows = Object.entries(fields)
-    .map(([label, value]) =>
-      `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:bold;background:#f5f5f5;width:40%;">${label}</td><td style="padding:8px 12px;border:1px solid #ddd;">${value}</td></tr>`
-    )
-    .join('');
+  if (!token) {
+    return res.status(500).json({ error: 'Missing MAILTRAP_PASS' });
+  }
 
-  const html = `<h2>New Quote Request - Black Bird Services</h2><table style="border-collapse:collapse;width:100%;max-width:600px;font-family:Arial,sans-serif;">${rows}</table>`;
+  const fields = [
+    `First Name: ${firstName}`,
+    `Last Name: ${lastName}`,
+    `Pick Up Date: ${pickupDate}`,
+    `Pick Up Time: ${pickupTime}`,
+    `Pick Up Location: ${pickupLocation}`,
+    `Destination: ${destination || 'N/A'}`,
+    `Service Type: ${serviceType}`,
+    `Hours: ${hours}`,
+    `Passengers: ${passengers}`,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+  ];
+
+  const text = fields.join('\n');
 
   try {
-    const response = await fetch('https://send.api.mailtrap.io/api/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Api-Token': process.env.MAILTRAP_API_TOKEN || '',
-      },
-      body: JSON.stringify({
-        from: { email: 'info@norbwebsite.com', name: 'Black Bird Services' },
-        // to: [{ email: 'alexm900902@gmail.com' }],
-        to: [{ email: 'tovelrob@proton.me' }],
-        subject: `New Quote Request from ${firstName} ${lastName}`,
-        html,
-        category: 'Quote Request',
-      }),
-    });
+    const client = new MailtrapClient({ token });
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error('Mailtrap error:', err);
-      return res.status(500).json({ error: 'Failed to send email' });
-    }
+    await client.send({
+      from: { name: 'Black Bird Services', email: senderEmail },
+      to: [{ email: 'alexm900902@gmail.com' }],
+      subject: `New Quote Request from ${firstName} ${lastName}`,
+      text,
+    });
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error('Send error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Send error:', error.message);
+    return res.status(500).json({ error: error.message });
   }
 }
