@@ -42,8 +42,9 @@ export default async function handler(req, res) {
         'Api-Token': process.env.MAILTRAP_API_TOKEN || '',
       },
       body: JSON.stringify({
-        from: { email: 'mailtrap@demomailtrap.com', name: 'Black Bird Services' },
-        to: [{ email: 'alexm900902@gmail.com' }],
+        from: { email: 'info@norbwebsite.com', name: 'Black Bird Services' },
+        // to: [{ email: 'alexm900902@gmail.com' }],
+        to: [{ email: 'tovelrob@proton.me' }],
         subject: `New Quote Request from ${firstName} ${lastName}`,
         html,
         category: 'Quote Request',
