@@ -56,6 +56,7 @@ export default function QuoteForm() {
   const { t } = useLang();
   const [form, setForm] = useState<FormData>(initialForm);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const update = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let val = e.target.value;
@@ -78,11 +79,13 @@ export default function QuoteForm() {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error('Failed');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
       setStatus('success');
       setForm(initialForm);
-    } catch {
+    } catch (err: any) {
       setStatus('error');
+      setErrorMsg(err.message);
     }
   };
 
@@ -118,7 +121,7 @@ export default function QuoteForm() {
         )}
         {status === 'error' && (
           <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-center text-sm">
-            {t('form.error')}
+            {t('form.error')}{errorMsg ? `: ${errorMsg}` : ''}
           </div>
         )}
 
