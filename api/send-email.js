@@ -2,7 +2,8 @@ import { MailtrapClient } from 'mailtrap';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const {
@@ -11,14 +12,16 @@ export default async function handler(req, res) {
   } = req.body;
 
   if (!firstName || !lastName || !pickupDate || !pickupTime || !pickupLocation || !serviceType || !hours || !passengers || !phone || !email) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    res.status(400).json({ error: 'Missing required fields' });
+    return;
   }
 
   const token = process.env.MAILTRAP_PASS;
   const senderEmail = process.env.MAILTRAP_SENDER || 'info@norbwebsite.com';
 
   if (!token) {
-    return res.status(500).json({ error: 'Missing MAILTRAP_PASS' });
+    res.status(500).json({ error: 'Missing MAILTRAP_PASS' });
+    return;
   }
 
   const fields = [
@@ -47,9 +50,9 @@ export default async function handler(req, res) {
       text,
     });
 
-    return res.status(200).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error('Send error:', error.message);
-    return res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 }

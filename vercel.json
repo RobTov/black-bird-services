@@ -1,5 +1,12 @@
 {
+  "functions": {
+    "api/send-email.js": {
+      "memory": 300,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
