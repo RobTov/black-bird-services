@@ -1,27 +1,16 @@
 import { useLang } from '../context/LanguageContext';
+import type { TranslationKey } from '../i18n/translations';
 
-const serviceKeys = [
-  'services.airport',
-  'services.hourly',
-  'services.pointToPoint',
-  'services.wedding',
-  'services.cityTour',
-  'services.concert',
-  'services.prom',
-  'services.birthday',
-  'services.roundTrip',
-] as const;
-
-const icons = [
-  '✈️',
-  '🕐',
-  '↔️',
-  '💍',
-  '🏙️',
-  '🎵',
-  '🎓',
-  '🎂',
-  '🔄',
+const services: { title: TranslationKey; desc: TranslationKey }[] = [
+  { title: 'services.airport', desc: 'services.airportDesc' },
+  { title: 'services.hourly', desc: 'services.hourlyDesc' },
+  { title: 'services.pointToPoint', desc: 'services.pointToPointDesc' },
+  { title: 'services.wedding', desc: 'services.weddingDesc' },
+  { title: 'services.cityTour', desc: 'services.cityTourDesc' },
+  { title: 'services.concert', desc: 'services.concertDesc' },
+  { title: 'services.prom', desc: 'services.promDesc' },
+  { title: 'services.birthday', desc: 'services.birthdayDesc' },
+  { title: 'services.roundTrip', desc: 'services.roundTripDesc' },
 ];
 
 export default function Services() {
@@ -49,17 +38,19 @@ export default function Services() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {serviceKeys.map((key, i) => (
+          {services.map((s) => (
             <div
-              key={key}
+              key={s.title}
               className="group relative p-6 bg-dark-200/50 border border-white/5 hover:border-gold/30 transition-all duration-500 cursor-default"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-gold/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
-                <span className="text-2xl block mb-3">{icons[i]}</span>
-                <h3 className="text-white font-heading text-xl font-semibold group-hover:text-gold transition-colors duration-300">
-                  {t(key)}
+                <h3 className="text-white font-heading text-xl font-semibold group-hover:text-gold transition-colors duration-300 mb-2">
+                  {t(s.title)}
                 </h3>
+                <p className="text-white/50 text-sm leading-relaxed">
+                  {t(s.desc)}
+                </p>
               </div>
             </div>
           ))}

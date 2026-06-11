@@ -36,12 +36,12 @@ export default function Fleet() {
           <div className="relative">
             <div className="aspect-16/9 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=900&q=80"
+                src="images/img1.jpg"
                 alt="Cadillac XT6"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-4 -left-4 w-32 h-32 border border-gold/30 -z-10 hidden sm:block" />
+            <div className="absolute -bottom-6 -left-6 w-64 h-36 border border-gold/30 -z-10 hidden sm:block" />
           </div>
 
           <div>
