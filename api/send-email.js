@@ -1,4 +1,4 @@
-import { MailtrapClient } from 'mailtrap';
+import { Resend } from 'resend';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,11 +16,11 @@ export default async function handler(req, res) {
     return;
   }
 
-  const token = process.env.MAILTRAP_PASS;
-  const senderEmail = process.env.MAILTRAP_SENDER || 'info@norbwebsite.com';
+  const apiKey = process.env.RESEND_API_KEY;
+  const senderEmail = process.env.RESEND_SENDER || 'info@dallasblackbird.com';
 
-  if (!token) {
-    res.status(500).json({ error: 'Missing MAILTRAP_PASS' });
+  if (!apiKey) {
+    res.status(500).json({ error: 'Missing RESEND_API_KEY' });
     return;
   }
 
@@ -41,20 +41,25 @@ export default async function handler(req, res) {
   const text = fields.join('\n');
 
   try {
-    const client = new MailtrapClient({ token });
+    const resend = new Resend(apiKey);
 
-    const response = await client.send({
-      from: { name: 'Black Bird Services', email: senderEmail },
-      to: [{ email: 'tovelrob@proton.me' }],
+    const { data, error } = await resend.emails.send({
+      from: `"Black Bird Services" <${senderEmail}>`,
+      to: 'tovelrob@proton.me',
       subject: `New Quote Request from ${firstName} ${lastName}`,
       text,
     });
 
-    console.log('Mailtrap response:', JSON.stringify(response));
+    if (error) {
+      console.error('Resend error:', error);
+      res.status(500).json({ error: error.message });
+      return;
+    }
 
+    console.log('Resend response:', JSON.stringify(data));
     res.status(200).json({ success: true });
-  } catch (error) {
-    console.error('Send error:', error.message);
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error('Send error:', err.message);
+    res.status(500).json({ error: err.message });
   }
 }
