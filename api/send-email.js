@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { MailtrapClient } from 'mailtrap';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,13 +16,10 @@ export default async function handler(req, res) {
     return;
   }
 
-  const host = process.env.MAILTRAP_HOST || 'live.smtp.mailtrap.io';
-  const port = parseInt(process.env.MAILTRAP_PORT || '587', 10);
-  const user = process.env.MAILTRAP_USER || 'api';
-  const pass = process.env.MAILTRAP_PASS;
+  const token = process.env.MAILTRAP_PASS;
   const senderEmail = process.env.MAILTRAP_SENDER || 'info@norbwebsite.com';
 
-  if (!pass) {
+  if (!token) {
     res.status(500).json({ error: 'Missing MAILTRAP_PASS' });
     return;
   }
@@ -44,21 +41,16 @@ export default async function handler(req, res) {
   const text = fields.join('\n');
 
   try {
-    const transporter = nodemailer.createTransport({
-      host,
-      port,
-      secure: false,
-      auth: { user, pass },
-    });
+    const client = new MailtrapClient({ token });
 
-    await transporter.verify();
-
-    await transporter.sendMail({
-      from: `"Black Bird Services" <${senderEmail}>`,
-      to: 'tovelrob@proton.me',
+    const response = await client.send({
+      from: { name: 'Black Bird Services', email: senderEmail },
+      to: [{ email: 'tovelrob@proton.me' }],
       subject: `New Quote Request from ${firstName} ${lastName}`,
       text,
     });
+
+    console.log('Mailtrap response:', JSON.stringify(response));
 
     res.status(200).json({ success: true });
   } catch (error) {
