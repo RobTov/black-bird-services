@@ -45,7 +45,7 @@ export default async function handler(req, res) {
 
     const { data, error } = await resend.emails.send({
       from: `"Black Bird Services" <${senderEmail}>`,
-      to: 'tovelrob@proton.me',
+      to: 'alexm900902@gmail.com',
       subject: `New Quote Request from ${firstName} ${lastName}`,
       text,
     });
